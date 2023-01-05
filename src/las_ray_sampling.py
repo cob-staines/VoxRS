@@ -1,6 +1,6 @@
 # function file for voxel ray sampling of lidar
 
-# begin by building voxel space with voxel config file: vox_template_config.py
+# begin by building voxel space with voxel config file: config_1_sampling_template.py
 # resample voxel space with resampling config files:
     # las_ray_sample_from_grid.py -- sample parallel rays over given points (eg. vertical transmittance)
     # las_ray_sample_hemi_from_pts.py -- sample over hemispherical set of rays over given points
@@ -1613,9 +1613,9 @@ class RaySampleGridMetaObj(object):
         self.max_distance = None
         self.min_distance = None
         self.prior = None
-        self.lookup_db = None
+        self.lookup_db = 'posterior'  # 'posterior' or 'count' ('count' used for troubleshooting/dev)
         self.config_id = None
-        self.agg_method = None
+        self.agg_method = 'single_ray_agg'  # 'single_ray_agg' by default. Other agg methods in dev.
 
 
 def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
