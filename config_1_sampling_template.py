@@ -6,7 +6,7 @@ def main():
     """
 
     import numpy as np
-    from src import las_ray_sampling as lrs
+    import src.las_ray_sampling as lrs
 
 
     # # DATA INPUT PARAMETERS
