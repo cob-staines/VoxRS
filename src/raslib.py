@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-from osgeo import osr
-from osgeo import gdal, gdalconst
+import gdal
 from affine import Affine
 from copy import deepcopy
 
@@ -247,7 +246,7 @@ def gdal_raster_reproject(src, match, nodatavalue=np.nan, mode="nearest"):
     # Source
     if isinstance(src, str):
         src_filename = src
-        src = gdal.Open(src_filename, gdalconst.GA_ReadOnly)
+        src = gdal.Open(src_filename, gdal.GA_ReadOnly)
     elif ~isinstance(src, gdal.Dataset):
         raise Exception('src is not either a file path or osgeo.gdal.Dataset')
 
@@ -258,7 +257,7 @@ def gdal_raster_reproject(src, match, nodatavalue=np.nan, mode="nearest"):
     # Match
     if isinstance(match, str):
         match_filename = match
-        match = gdal.Open(match_filename, gdalconst.GA_ReadOnly)
+        match = gdal.Open(match_filename, gdal.GA_ReadOnly)
     elif ~isinstance(match, gdal.Dataset):
         raise Exception('match is not either a file path or osgeo.gdal.Dataset')
 
