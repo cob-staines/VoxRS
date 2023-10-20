@@ -10,8 +10,8 @@
 import numpy as np
 import pandas as pd
 import warnings
-import las_trajectory_merge as ltm
-import raslib
+import src.las_trajectory_merge as ltm
+import src.raslib as raslib
 import time
 import h5py
 import os

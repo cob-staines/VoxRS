@@ -8,7 +8,7 @@ def main():
     :return:
     """
 
-    from src import las_ray_sampling as lrs
+    import src.las_ray_sampling as lrs
     import numpy as np
     import pandas as pd
     import os
