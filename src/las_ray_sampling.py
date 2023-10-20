@@ -9,6 +9,7 @@
 
 import numpy as np
 import pandas as pd
+import warnings
 import las_trajectory_merge as ltm
 import raslib
 import time
@@ -16,6 +17,7 @@ import h5py
 import os
 import shutil
 import tifffile as tiff
+import imageio
 from tqdm import tqdm
 
 
@@ -444,7 +446,6 @@ def las_ray_sample_by_z_slice(vox, z_slices=1, fail_overflow=False):
     start_time = time.time()
 
     if vox.sample_length > vox.step[0]:
-        import warnings
         warnings.warn("vox.sample_length is greater than vox.step, some voxels will be stepped over in sampling. Consider smaller sample_length", UserWarning)
 
     if fail_overflow:
@@ -1402,7 +1403,6 @@ def hemi_rays_to_img(rays_out, img_path, img_size, area_factor):
     :param area_factor: scalar correction factor
     :return:
     """
-    import imageio
 
     rays_out = rays_out.assign(transmittance=np.exp(-1 * area_factor * rays_out.returns_mean))
     template = np.full([img_size, img_size], 1.0)
