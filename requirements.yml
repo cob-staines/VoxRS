@@ -6,7 +6,7 @@ dependencies:
   - numpy
   - scipy
   - pandas
-  - gdal=USE_GDAL_VERSION
+  - gdal
   - affine
   - tqdm
   - h5py
