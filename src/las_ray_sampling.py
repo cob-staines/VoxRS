@@ -217,7 +217,7 @@ def duplicate_vox(vox, hdf5_out, duplicate_post=False, z_slices=1):
             post.create_dataset('posterior_beta', dtype=post_dtype, shape=vox.ncells, chunks=True, compression='gzip')
 
     # copy datasets by z_slice
-    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Write data"):
+    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Write data", colour='white'):
         z_low = zz * z_step
         if zz != (z_slices - 1):
             z_high = (zz + 1) * z_step
@@ -626,7 +626,7 @@ def las_ray_sample_by_z_slice(vox, z_slices=1, fail_overflow=False):
                 max_step = np.ceil(np.max(dist) / vox.sample_length).astype(int)
 
                 prog_desc = "chunk " + str(ii + 1) + "/" + str(n_chunks) + ": slice " + str(zz + 1) + "/" + str(z_slices)
-                for jj in tqdm(range(0, max_step), leave=True, ncols=100, desc=prog_desc):
+                for jj in tqdm(range(0, max_step), leave=True, ncols=100, desc=prog_desc, colour='white'):
                     # distance from p0 along ray
                     sample_dist = (jj + offset) * vox.sample_length
 
@@ -718,7 +718,7 @@ def vox_addition(voxList, vox_out, z_slices=1):
         vox_n = load_vox(voxList[nn], load_data=False)
 
         prog_desc = "Vox " + str(nn)
-        for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc=prog_desc):
+        for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc=prog_desc, colour='white'):
             z_low = zz * z_step
             if zz != (z_slices - 1):
                 z_high = (zz + 1) * z_step
@@ -769,7 +769,7 @@ def beta_lookup_post_calc(vox, z_slices=1, agg_sample_length=None):
     rate_sq_sum = 0  # cumulative sum of square of rates
 
     # loop through z_slices
-    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Post calc"):
+    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Post calc", colour='white'):
 
         z_low = zz * z_step
         if zz != (z_slices - 1):
@@ -827,7 +827,7 @@ def beta_lookup_post_calc(vox, z_slices=1, agg_sample_length=None):
     sample_length_correction = vox.sample_length / agg_sample_length
 
     # loop through z_slices
-    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Write posterior"):
+    for zz in tqdm(range(0, z_slices), leave=True, ncols=100, desc="Write posterior", colour='white'):
 
         z_low = zz * z_step
         if zz != (z_slices - 1):
@@ -1469,7 +1469,7 @@ def vox_to_las(vox, las_out, samps_per_vox=1, sample_threshold=0):
     vox.posterior_alpha = None
     vox.posterior_beta = None
 
-    for ii in tqdm(range(samps_per_vox), desc="vox samples", ncols=100):
+    for ii in tqdm(range(samps_per_vox), desc="vox samples", ncols=100, colour='white'):
         accept = (np.random.random(rate.shape) <= rate) & valid
         vox_accept = np.where(accept)
         # vox_classification = sampled[accept]
@@ -1759,7 +1759,7 @@ def rshm_iterate(rshm, rshmeta, vox, log_path, process_id=0, nrows=4):
 
     vox_sub = subset_vox(rshm.loc[:, ['x_utm11n', 'y_utm11n', 'elevation_m']].values, vox, rshmeta.max_distance, rshmeta.lookup_db)
 
-    for ii in tqdm(range(0, len(rshm)), position=process_id, desc=str(process_id), leave=True, ncols=100, nrows=nrows + 1):
+    for ii in tqdm(range(0, len(rshm)), position=process_id, desc=str(process_id), leave=True, ncols=100, nrows=nrows + 1, colour='white'):
         it_time = time.time()
 
         iid = rshm.index[ii]
@@ -1870,7 +1870,7 @@ def rs_gridgen(rsgmeta, vox, chunksize=1000000, initial_index=0):
     # load dem as points
     points_in = dem_to_points(rsgmeta.src_ras_file, rsgmeta.mask_file)
 
-    for ii in tqdm(range(initial_index, len(rsgm)), desc="angle set", ncols=100):
+    for ii in tqdm(range(initial_index, len(rsgm)), desc="angle set", ncols=100, colour='white'):
         print(str(ii + 1) + " of " + str(len(rsgm)) + ': ', end='')
 
         it_time = time.time()

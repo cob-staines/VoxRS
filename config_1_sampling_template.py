@@ -23,15 +23,10 @@ def main():
     #            Trajectory file should include the following header labels: Time[s], Easting[m], Northing[m], Height[m]
     vox.traj_in = ''
 
-    # vox.return_set (str) - 'first' (recommended), 'last', or 'all'
-    vox.return_set = 'first'
-
-    # vox.drop class (int) single class to be dropped from .las file prior to interpolation
-    vox.drop_class = 7
-
-
     # # VOXEL SPACE PARAMETERS
-    vox.las_traj_hdf5 = vox.las_in.replace('.las', '_ray_sampling_' + vox.return_set + '_returns_drop_' + str(vox.drop_class) + '_las_traj.h5')  # file path to las/trajectory file (.hdf5)
+    vox.las_traj_hdf5 = vox.las_in.replace('.las', '_ray_sampling_' + config_id + '_las_traj.h5')  # file path to las/trajectory file (.hdf5)
+    vox.return_set = 'first'  # vox.return_set (str) - 'first' (recommended), 'last', or 'all'
+    vox.drop_class = -1  # vox.drop class (int) single class to be dropped from .las file prior to interpolation (-1 for None)
     vox.sample_dtype = np.uint32  # data type for voxel sample array (smaller is faster, overflow throws no errors)
     vox.return_dtype = np.uint32  # data type for voxel return array (smaller is faster, overflow throws no errors)
     vox.las_traj_chunksize = 10000000  # point cloud chunk size for interpolation with trajectory (default 10000000)

@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import gdal
+from osgeo import gdal
 from affine import Affine
 from copy import deepcopy
 

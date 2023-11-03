@@ -3,6 +3,7 @@ import laspy
 import numpy as np
 import pandas as pd
 import h5py
+import warnings
 
 
 def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', drop_class=None):
@@ -40,6 +41,9 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
 
     # filter points
 
+    if drop_class == -1:
+        drop_class = None
+
     # drop noise
     if drop_class is not None:
         print('Filtering points by class... ', end='')
@@ -58,7 +62,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
             raise Exception('Return sets other than "all", "first" and "last" have yet to be programmed. Will you do the honors?')
         print('done')
 
-    print('Sorting values... ', end='')
+    print('Sorting returns... ', end='')
     p0 = p0.sort_values(by="gps_time")
     print('done')
 
@@ -152,7 +156,9 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
 
         # angle from nadir
         dp = p1 - p2
-        phi = np.arctan(np.sqrt(dp[0] ** 2 + dp[1] ** 2) / dp[2]) * 180 / np.pi  # in degrees
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message="divide by zero encountered in true_divide")
+            phi = np.arctan(np.sqrt(dp[0] ** 2 + dp[1] ** 2) / dp[2]) * 180 / np.pi  # in degrees
         merged = merged.assign(angle_from_nadir_deg=phi)
 
         # angle cw from north
