@@ -23,47 +23,44 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
     :return:
     """
 
-
     print('Loading LAS file... ', end='')
     # load las_in
-    inFile = laspy.file.File(las_in, mode="r")
-    # load data
-    p0 = pd.DataFrame({"gps_time": inFile.gps_time,
-                       "x": inFile.x,
-                       "y": inFile.y,
-                       "z": inFile.z,
-                       "classification": inFile.classification,
-                       "num_returns": inFile.num_returns,
-                       "return_num": inFile.return_num})
-    # close las_in
-    inFile.close()
+    inFile = laspy.read(las_in)
     print('done')
 
     # filter points
-
-    if drop_class == -1:
-        drop_class = None
+    p0 = inFile.points
 
     # drop noise
-    if drop_class is not None:
+    if drop_class >= 0:
         print('Filtering points by class... ', end='')
         if not isinstance(drop_class, int):
-            raise Exception('drop_class only set to handle single classes. More development required to handle multiple classes')
-        p0 = p0.loc[p0.classification != drop_class, :]
-        print('done')
-    # keep returns
-    if keep_return != 'all':
-        print('Filtering points by return... ', end='')
-        if keep_return == 'first':
-            p0 = p0.loc[p0.return_num == 1, :]
-        elif keep_return == 'last':
-            p0 = p0.loc[p0.return_num == p0.num_returns, :]
-        else:
-            raise Exception('Return sets other than "all", "first" and "last" have yet to be programmed. Will you do the honors?')
+            raise Exception(
+                'drop_class only set to handle single classes. More development required to handle multiple classes')
+        p0 = p0[inFile.classification != drop_class]
         print('done')
 
+    # keep returns
+    print('Filtering points by return... ', end='')
+    if keep_return == 'first':
+        p0 = p0[p0.return_num == 1]
+    elif keep_return == 'last':
+        p0 = p0[p0.return_num == p0.num_returns]
+    elif keep_return != 'all':
+        raise Exception(
+            'Return sets other than "all", "first" and "last" have yet to be programmed. Will you do the honors?')
+    print('done')
+
+    p0 = pd.DataFrame({"gps_time": p0.gps_time,
+                       "x": p0.x,
+                       "y": p0.y,
+                       "z": p0.z,
+                       "classification": p0.classification,
+                       "num_returns": p0.num_returns,
+                       "return_num": p0.return_num})
+
     print('Sorting returns... ', end='')
-    p0 = p0.sort_values(by="gps_time")
+    p0 = p0.sort_values(by="gps_time")  # improve join time
     print('done')
 
     n_rows = len(p0)
@@ -73,6 +70,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
     with h5py.File(hdf5_path, 'w') as hf:
         hf.create_dataset('lasData', p0.shape, data=p0.values, chunks=(chunksize, 1), compression='gzip')
         hf.create_dataset('lasData_cols', data=las_cols, dtype=h5py.string_dtype(encoding='utf-8'))
+    inFile = None
     p0 = None
     print('done')
 
@@ -86,7 +84,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
                                 'Height[m]': "traj_z"})
     # drop pitch, roll, yaw
     traj = traj[['gps_time', 'traj_x', 'traj_y', 'traj_z']]
-    traj = traj.sort_values(by="gps_time").reset_index(drop=True)
+    traj = traj.sort_values(by="gps_time").reset_index(drop=True)  # improve join time
 
     # add las key (False)
     traj = traj.assign(las=False)

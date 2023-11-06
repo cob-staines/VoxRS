@@ -1488,25 +1488,21 @@ def vox_to_las(vox, las_out, samps_per_vox=1, sample_threshold=0):
     # convert to utm
     utm_points = vox_to_utm(vox, vox_address_noise)
 
-    # hdr = laspy.header.Header(file_version=1.4, point_format=7)
-    hdr = laspy.header.Header()
-    mins = np.floor(np.min(utm_points, axis=0))
-    maxs = np.ceil(np.max(utm_points, axis=0))
-    scale = [0.00025, 0.00025, 0.00025]
-    print("writing las...", end="")
-    with laspy.file.File(las_out, mode="w", header=hdr) as outfile:
-        # header attributes
-        outfile.software_id = "las_ray_sampling.py/vox_to_las"
-        outfile.header.offset = mins
-        outfile.header.scale = scale
-        outfile.header.min = mins
-        outfile.header.max = maxs
+    # 1. Create a new header
+    header = laspy.LasHeader(point_format=6, version="1.4")
+    header.offsets = np.floor(np.min(utm_points, axis=0))
+    header.scales = [0.00025, 0.00025, 0.00025]
+    header.generating_software = "las_ray_sampling.py/vox_to_las"
 
-        # points
-        outfile.x = utm_points[:, 0]
-        outfile.y = utm_points[:, 1]
-        outfile.z = utm_points[:, 2]
-        # outfile.classification = vox_classification_all.astype(np.uint8)
+    # 2. Create a Las
+    las = laspy.LasData(header)
+
+    las.x = utm_points[:, 0]
+    las.y = utm_points[:, 1]
+    las.z = utm_points[:, 2]
+
+    print("writing las...", end="")
+    las.write(las_out)
     print("done")
 
 

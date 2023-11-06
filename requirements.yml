@@ -10,6 +10,6 @@ dependencies:
   - affine
   - tqdm
   - h5py
-  - laspy<2.0.0
+  - laspy
   - tifffile
   - imageio
