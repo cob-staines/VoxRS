@@ -49,8 +49,6 @@ def raster_load(ras_in):
         # ras.T1 -- affine transformation for cell centers
 
     # dependencies
-    # import gdal
-    from osgeo import gdal
 
     # open single band geo-raster file
     ras = gdal.Open(ras_in, gdal.GA_ReadOnly)

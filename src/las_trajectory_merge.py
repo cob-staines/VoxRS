@@ -51,13 +51,13 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
             'Return sets other than "all", "first" and "last" have yet to be programmed. Will you do the honors?')
     print('done')
 
-    p0 = pd.DataFrame({"gps_time": p0.gps_time,
-                       "x": p0.x,
-                       "y": p0.y,
-                       "z": p0.z,
-                       "classification": p0.classification,
-                       "num_returns": p0.num_returns,
-                       "return_num": p0.return_num})
+    d0 = inFile
+    d0.points = p0
+
+    p0 = pd.DataFrame({"gps_time": np.array(d0.gps_time),
+                       "x": np.array(d0.x),
+                       "y": np.array(d0.y),
+                       "z": np.array(d0.z)})
 
     print('Sorting returns... ', end='')
     p0 = p0.sort_values(by="gps_time")  # improve join time
@@ -66,11 +66,17 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
     n_rows = len(p0)
     las_cols = p0.columns
 
+    if chunksize is None:
+        chunksize = n_rows
+    elif n_rows < chunksize:
+        chunksize = n_rows
+
     print('Writing LAS data to HDF5... ', end='')
     with h5py.File(hdf5_path, 'w') as hf:
-        hf.create_dataset('lasData', p0.shape, data=p0.values, chunks=(chunksize, 1), compression='gzip')
+        hf.create_dataset('lasData', shape=p0.shape, data=p0.values, chunks=(chunksize, 1), compression='gzip')
         hf.create_dataset('lasData_cols', data=las_cols, dtype=h5py.string_dtype(encoding='utf-8'))
     inFile = None
+    d0 = None
     p0 = None
     print('done')
 
@@ -92,9 +98,6 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
 
     # preallocate output
     traj_interpolated = pd.DataFrame(columns=["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"])
-
-    if chunksize is None:
-        chunksize = n_rows
 
     n_chunks = np.ceil(n_rows / chunksize).astype(int)
 
@@ -119,7 +122,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
         traj_end = np.min(traj.index[traj.gps_time > np.max(las_data.gps_time)])
 
         # append traj to las, keeping track of las index
-        outer = las_data[['gps_time', 'las']].append(traj.loc[traj_start:traj_end, :], sort=False)
+        outer = las_data[['gps_time', 'las']]._append(traj.loc[traj_start:traj_end, :], sort=False)
         outer = outer.reset_index()
         outer = outer.rename(columns={"index": "index_las"})
 
@@ -163,7 +166,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
         theta = np.arctan2(dp[0], (dp[1])) * 180 / np.pi
         merged = merged.assign(angle_cw_from_north_deg=theta)
 
-        traj_interpolated = traj_interpolated.append(merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]])
+        traj_interpolated = traj_interpolated._append(merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]])
 
         print('Interpolated ' + str(ii + 1) + ' of ' + str(n_chunks) + ' chunks')
 

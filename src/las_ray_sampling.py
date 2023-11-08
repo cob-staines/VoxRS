@@ -1299,9 +1299,9 @@ def ray_stats_to_dem(rays, dem_in, file_out):
 
     # preallocate data
     ras.data = []
-    ras.data.append(np.full(shape, np.nan))
-    ras.data.append(np.full(shape, np.nan))
-    ras.data.append(np.full(shape, np.nan))
+    ras.data._append(np.full(shape, np.nan))
+    ras.data._append(np.full(shape, np.nan))
+    ras.data._append(np.full(shape, np.nan))
 
     # store data
     ras.data[0][xy_index] = rays.returns_mean
@@ -1666,7 +1666,7 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
     vector_set = hemi_vectors(rshmeta.img_size, rshmeta.max_phi_rad)
     vector_set.to_csv(rshm.file_dir[0] + "phi_theta_lookup.csv", index=False)
 
-    if initial_index is not 0:
+    if initial_index != 0:
         rshm = rshm.iloc[initial_index:, :]
 
     if tile_count_1d == 1:
@@ -1702,14 +1702,14 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
 
             # preallocate tile log file
             log_path = rshmeta.file_dir + "\\tile_logs\\rshmetalog_tile_" + str(tt) + ".csv"
-            log_path_list.append(log_path)
+            log_path_list._append(log_path)
             if not os.path.exists(log_path):
                 with open(log_path, mode='w', encoding='utf-8') as log:
                     log.write(",".join(rshm.columns) + '\n')
                 log.close()
 
             rshm_tile = rshm.loc[rshm.tile_id == tt, :].copy()
-            rshm_list.append(rshm_tile)
+            rshm_list._append(rshm_tile)
 
         if n_cores > 1:
             # multiple cores
@@ -1729,8 +1729,8 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
         temp_log_count = []
         for ff in t_loglist:
             temp_log = pd.read_csv(rshmeta.file_dir + "\\tile_logs\\" + ff)
-            temp_log_count.append(len(temp_log))
-            log_comp = log_comp.append(temp_log, ignore_index=True)
+            temp_log_count._append(len(temp_log))
+            log_comp = log_comp._append(temp_log, ignore_index=True)
 
         log_comp.to_csv(rshmeta.file_dir + "rshmetalog.csv")
 

@@ -11,33 +11,35 @@ def main():
 
     # # DATA INPUT PARAMETERS
     # config_id (str) - unique identifier for the configuration used for voxel space identification
-    config_id = ''
+    config_id = 'test_19_052'
 
     # Initiate voxel obj
     vox = lrs.VoxelObj()
 
     # vox.las_in (str) - file path of .las file
-    vox.las_in = ''
+    vox.las_in = r'C:\Users\Cob\index\educational\usask\research\masters\data\lidar\19_052\19_052_all_WGS84_utm11N_clipped.las'
 
     # vox.traj_in (str) - file path to trajectory file (.csv) corresponding to las file.
     #            Trajectory file should include the following header labels: Time[s], Easting[m], Northing[m], Height[m]
-    vox.traj_in = ''
+    vox.traj_in = r'C:\Users\Cob\index\educational\usask\research\masters\data\lidar\19_052\19_052_all_trajectories_WGS84_utm11N.txt'
+
 
     # # VOXEL SPACE PARAMETERS
     vox.las_traj_hdf5 = vox.las_in.replace('.las', '_ray_sampling_' + config_id + '_las_traj.h5')  # file path to las/trajectory file (.hdf5)
-    vox.return_set = 'first'  # (str) - 'first' (recommended), 'last', or 'all'
-    vox.drop_class = -1  # (int) single class to be dropped from .las file prior to interpolation (-1 for None)
+    vox.return_set = 'first'  # vox.return_set (str) - 'first' (recommended), 'last', or 'all'
+    vox.drop_class = 4  # vox.drop class (int) single class to be dropped from .las file prior to interpolation (-1 for None)
     vox.sample_dtype = np.uint32  # data type for voxel sample array (smaller is faster, overflow throws no errors)
     vox.return_dtype = np.uint32  # data type for voxel return array (smaller is faster, overflow throws no errors)
-    vox.las_traj_chunksize = 10000000  # (int) point cloud chunk size for interpolation with trajectory (default 10000000)
-    vox.cw_rotation = 0 * np.pi / 180  # (int) rotation of primary voxelspace axis in radians (default 0)
-    voxel_length = .25  # voxel dimension in meters
+    vox.las_traj_chunksize = 10000000  # point cloud chunk size for interpolation with trajectory (default 10000000)
+    vox.cw_rotation = 0 * np.pi / 180  # rotation of primary voxelspace axis in radians (default 0)
+    voxel_length = 1  # voxel dimension in meters
     vox.step = np.full(3, voxel_length)  # cubic voxels by default
     vox.sample_length = voxel_length / np.pi  # ray sample length (keep smaller than voxel length)
     vox.vox_hdf5 = vox.las_in.replace('.las', config_id + '_r' + str(voxel_length) + '_vox.h5')  # file path to vox file (.hdf5)
 
     # # PROCESSING PARAMETERS
-    z_slices = 4  # (int) - number of horizontal layers for chunking of ray sampling (increase for memory management)
+    # z_slices (int) - number of horizontal layers for chunking of ray sampling (increase for memory management)
+    z_slices = 4
 
 
     # # BUILD VOX
