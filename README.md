@@ -11,4 +11,31 @@ The probability of a lidar return along an arbitrary ray through the voxel space
 * **Gridded resampling**: a set of rays with a fixed zenith/azimuth pair is generated across a given grid.
 
 ## Getting Started
-Config files (.py) are used to point to all files, specify configuration variables, and call functions.
+
+### Download VoxRS
+VoxRS is available for download on Github. The easiest way to get the files is to clone the repository with:
+
+```
+git clone https://github.com/jstaines/VoxRS.git
+```
+
+### Install Dependencies
+ - Python >= 3.7
+ - Install GDAL development files from package manager (ex. 'gdal-devel')
+
+### Install VoxRS
+With Conda:
+```
+cd VoxRS
+conda env create -f requirements.yml
+conda activate voxrs
+```
+
+With pip:
+```
+cd VoxRS
+pip install -r "requirements.txt"
+```
+
+### Running VoxRS
+Config files (.py) are used to point to all files, specify configuration variables, and call functions. Sperate configuration files are used for the sampling (ex. config_1_sampling_template.py) and resampling (ex. config_2_resampling_template.py) steps. To run VoxRS, copy these files, enter the desired configurations, and run them in order. Examples of configuration files are provided in \examples.
