@@ -137,7 +137,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
         outer = outer.set_index('gps_time')
 
         # forward fill nan values
-        interpolated = outer.fillna(method='ffill')
+        interpolated = outer.ffill()
 
         # drop traj entries
         interpolated = interpolated[interpolated['las']]
