@@ -484,7 +484,7 @@ def las_ray_sample_by_z_slice(vox, z_slices=1, fail_overflow=False):
 
 
     if (vox.origin is None) | (vox.max is None) :
-        print("Setting voxel space origin and max from data extent.")
+        print("Setting voxel space origin and max from data extent...", end='')
 
         with h5py.File(vox.las_traj_hdf5, 'r') as hf:
             z_min = np.min(hf['lasData'][:, 3])

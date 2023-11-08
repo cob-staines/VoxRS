@@ -166,7 +166,10 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
         theta = np.arctan2(dp[0], (dp[1])) * 180 / np.pi
         merged = merged.assign(angle_cw_from_north_deg=theta)
 
-        traj_interpolated = traj_interpolated._append(merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]])
+        if traj_interpolated.empty:
+            traj_interpolated = merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]]
+        else:
+            traj_interpolated = pd.concat([traj_interpolated, merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]]])
 
         print('Interpolated ' + str(ii + 1) + ' of ' + str(n_chunks) + ' chunks')
 
