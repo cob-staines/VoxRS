@@ -4,7 +4,6 @@ pandas
 gdal
 affine
 tqdm
-pyyaml
 h5py
 laspy
 tifffile

@@ -34,7 +34,7 @@ def main():
     voxel_length = .25  # voxel dimension in meters
     vox.step = np.full(3, voxel_length)  # cubic voxels by default
     vox.sample_length = voxel_length / np.pi  # ray sample length (keep smaller than voxel length)
-    vox.vox_hdf5 = vox.las_in.replace('.las', config_id + '_vox.h5')  # file path to vox file (.hdf5)
+    vox.vox_hdf5 = vox.las_in.replace('.las', config_id + '_r' + str(voxel_length) + '_vox.h5')  # file path to vox file (.hdf5)
 
     # # PROCESSING PARAMETERS
     z_slices = 4  # (int) - number of horizontal layers for chunking of ray sampling (increase for memory management)
