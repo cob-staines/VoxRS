@@ -103,6 +103,8 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
 
     for ii in range(0, n_chunks):
 
+        print('Interpolating ' + str(ii + 1) + ' of ' + str(n_chunks) + ' chunks... ', end='')
+
         # chunk start and end
         las_start = ii * chunksize
         if ii != (n_chunks - 1):
@@ -171,7 +173,7 @@ def las_traj(las_in, traj_in, hdf5_path, chunksize=10000000, keep_return='all', 
         else:
             traj_interpolated = pd.concat([traj_interpolated, merged.loc[:, ["gps_time", "traj_x", "traj_y", "traj_z", "distance_from_sensor_m", "angle_from_nadir_deg", "angle_cw_from_north_deg"]]])
 
-        print('Interpolated ' + str(ii + 1) + ' of ' + str(n_chunks) + ' chunks')
+        print('done')
 
 
     # save to hdf5 file

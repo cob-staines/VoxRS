@@ -441,7 +441,7 @@ def las_ray_sample_by_z_slice(vox, z_slices=1, fail_overflow=False):
     :return: voxel object
     """
 
-    print('----- LAS Ray Sampling -----')
+    print('\n----- LAS Ray Sampling -----')
 
     start_time = time.time()
 
@@ -1913,3 +1913,33 @@ def rs_gridgen(rsgmeta, vox, chunksize=1000000, initial_index=0):
     print("-------- Ray Sample Hemigen completed--------")
     print(str(len(rsgm) - initial_index) + " images generated in " + str(int(time.time() - tot_time)) + " seconds")
     return rsgm
+
+def create_dir(dir, desc=''):
+     # create batch dir (with error handling)
+    if os.path.exists(dir):
+        # if batch file dir exists
+        input_needed = True
+        while input_needed:
+            batch_exist_action = input(desc + " file directory (" + dir + ") already exists. Would you like to: (P)roceed and overwrite, (E)rase all and proceed, or (A)bort? ")
+            if batch_exist_action.upper() == "P":
+                input_needed = False
+            elif batch_exist_action.upper() == "E":
+                file_count = sum(len(files) for _, _, files in os.walk(dir))  # dir is your directory path as string
+                remove_confirmation = input("Remove "+ desc + " folder with " + str(file_count) + " contained files (Y/N)? ")
+                if remove_confirmation.upper() == "Y":
+                    # delete folder and contents
+                    import shutil
+                    shutil.rmtree(dir)
+                    # recreate dir
+                    os.makedirs(dir)
+                    input_needed = False
+                else:
+                    # return to while loop
+                    pass
+            elif batch_exist_action.upper() == "A":
+                raise Exception("Execution aborted by user input.")
+            else:
+                print("Invalid user input.")
+    else:
+        # create dir
+        os.makedirs(dir)
