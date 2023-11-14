@@ -1656,7 +1656,7 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
                         "lookup_db": rshmeta.lookup_db,
                         "config_id": rshmeta.config_id,
                         "agg_method": rshmeta.agg_method,
-                        "created_datetime": np.nan,
+                        "created_datetime": "",
                         "computation_time_s": np.nan})
 
     # resent index in case of rollover indexing
@@ -1688,8 +1688,9 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
         import multiprocessing.pool as mpp
 
         # create dir for tile log files
-        if not os.path.exists(rshmeta.file_dir + "\\tile_logs\\"):
-            os.makedirs(rshmeta.file_dir + "\\tile_logs\\")
+        log_dir = os.path.join(rshmeta.file_dir, "tile_logs")
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
 
         # batch tiling
         bin_counts, x_bins, y_bins, bin_num = binned_statistic_2d(rshm.x_utm11n, rshm.y_utm11n, rshm.y_utm11n, statistic='count', bins=tile_count_1d)
@@ -1701,15 +1702,15 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
         for tt in tiles:
 
             # preallocate tile log file
-            log_path = rshmeta.file_dir + "\\tile_logs\\rshmetalog_tile_" + str(tt) + ".csv"
-            log_path_list._append(log_path)
+            log_path = os.path.join(log_dir, "rshmetalog_tile_" + str(tt) + ".csv")
+            log_path_list.append(log_path)
             if not os.path.exists(log_path):
                 with open(log_path, mode='w', encoding='utf-8') as log:
                     log.write(",".join(rshm.columns) + '\n')
                 log.close()
 
             rshm_tile = rshm.loc[rshm.tile_id == tt, :].copy()
-            rshm_list._append(rshm_tile)
+            rshm_list.append(rshm_tile)
 
         if n_cores > 1:
             # multiple cores
@@ -1722,14 +1723,14 @@ def rs_hemigen(rshmeta, vox, tile_count_1d=1, n_cores=1, initial_index=0):
                 rshm_tile = rshm_iterate(rshm_list[jj], rshmeta, vox, log_path_list[jj], jj, 1)
 
         # compile tile log files
-        t_loglist = os.listdir(rshmeta.file_dir + "\\tile_logs\\")
+        t_loglist = os.listdir(log_dir)
         log_comp = rshm.copy()
         log_comp.drop(log_comp.index, inplace=True)
 
         temp_log_count = []
         for ff in t_loglist:
-            temp_log = pd.read_csv(rshmeta.file_dir + "\\tile_logs\\" + ff)
-            temp_log_count._append(len(temp_log))
+            temp_log = pd.read_csv(os.path.join(log_dir, ff))
+            temp_log_count.append(len(temp_log))
             log_comp = log_comp._append(temp_log, ignore_index=True)
 
         log_comp.to_csv(rshmeta.file_dir + "rshmetalog.csv")
@@ -1915,15 +1916,15 @@ def rs_gridgen(rsgmeta, vox, chunksize=1000000, initial_index=0):
     return rsgm
 
 def create_dir(dir, desc=''):
-     # create batch dir (with error handling)
+     # create dir (with error handling)
     if os.path.exists(dir):
-        # if batch file dir exists
+        # if dir exists
         input_needed = True
         while input_needed:
-            batch_exist_action = input(desc + " file directory (" + dir + ") already exists. Would you like to: (P)roceed and overwrite, (E)rase all and proceed, or (A)bort? ")
-            if batch_exist_action.upper() == "P":
+            dir_exist_action = input(desc + " file directory (" + dir + ") already exists. Would you like to: (P)roceed and risk overwrite, (E)rase all and proceed, or (A)bort? ")
+            if dir_exist_action.upper() == "P":
                 input_needed = False
-            elif batch_exist_action.upper() == "E":
+            elif dir_exist_action.upper() == "E":
                 file_count = sum(len(files) for _, _, files in os.walk(dir))  # dir is your directory path as string
                 remove_confirmation = input("Remove "+ desc + " folder with " + str(file_count) + " contained files (Y/N)? ")
                 if remove_confirmation.upper() == "Y":
@@ -1936,7 +1937,7 @@ def create_dir(dir, desc=''):
                 else:
                     # return to while loop
                     pass
-            elif batch_exist_action.upper() == "A":
+            elif dir_exist_action.upper() == "A":
                 raise Exception("Execution aborted by user input.")
             else:
                 print("Invalid user input.")
