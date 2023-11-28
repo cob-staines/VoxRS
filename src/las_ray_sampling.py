@@ -1858,7 +1858,7 @@ def rs_gridgen(rsgmeta, vox, chunksize=1000000, initial_index=0):
     rsgm = rsgm.reset_index(drop=True)
 
     # preallocate log file
-    log_path = rsgmeta.file_dir + "rsgmetalog.csv"
+    log_path = os.path.join(rsgmeta.file_dir, "rsgmetalog.csv")
     if not os.path.exists(log_path):
         with open(log_path, mode='w', encoding='utf-8') as log:
             log.write(",".join(rsgm.columns) + '\n')
@@ -1901,7 +1901,8 @@ def rs_gridgen(rsgmeta, vox, chunksize=1000000, initial_index=0):
         ras.data = [mean_data, std_data]
         ras_clipped = raslib.clip_raster_to_valid_extent(ras)
         # write image
-        raslib.raster_save(ras_clipped, rsgm.file_dir.iloc[ii] + rsgm.file_name.iloc[ii], data_format="float32")
+        raster_out = os.path.join(rsgm.file_dir.iloc[ii], rsgm.file_name.iloc[ii])
+        raslib.raster_save(ras_clipped, raster_out, data_format="float32")
 
         # log meta
         rsgm.loc[ii, "created_datetime"] = time.strftime('%Y-%m-%d %H:%M:%S')

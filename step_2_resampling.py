@@ -52,10 +52,43 @@ def main():
 
         samps_per_vox = config["samps_per_vox"]  # (int) volumetric resample rate [samples per voxel]
         sample_threshold = config["sample_threshold"]  # (int) noise filter will drop all returns from voxels where total returns <= sample_threshold           
-        las_out = os.path.join(vol_dir, config_id + runtag + "_resampled.las")  # (str) output .las file path
+        las_out = os.path.join(vol_dir, "vol_" + config_id + runtag + "_resampled.las")  # (str) output .las file path
 
         # GENERATE RESAMPLED POINT CLOUD
         lrs.vox_to_las(vox.vox_hdf5, las_out, samps_per_vox, sample_threshold)
+
+    # # GRID RESAMPLING
+    if config["resample_grid"]:
+        
+        # create grid_resampling folder if not exists
+        grid_dir = os.path.join(outputs_dir, 'grid_resampling')
+        if not os.path.exists(grid_dir):
+            os.makedirs(grid_dir)    
+        
+        # define VoxRS grid metadata object
+        rsgmeta = lrs.RaySampleGridMetaObj()
+        rsgmeta.file_dir = grid_dir
+        rsgmeta.lookup_db = 'posterior'  # (str) db lookup, default 'posterior'
+        rsgmeta.config_id = config_id
+        rsgmeta.agg_sample_length = vox.sample_length  # (num) ray resample length (default to same as sample length)
+        rsgmeta.agg_method = 'single_ray_agg'  # (str) aggregation method, default 'single_ray_agg'
+        
+        rsgmeta.src_ras_file = config["dem_in"]  # (str) complete path to raster (geotif) file with coordinates and elevations at which to calculate hemispheres, masked to points of interest
+        rsgmeta.mask_file = rsgmeta.src_ras_file  # (str) complete path to raster (geotif) file with mask of points of interest (use src_ras_file by default)
+        rsgmeta.phi = np.array(config["phi"]) * np.pi / 180  # zenith angle of rays (radians)
+        rsgmeta.theta = np.array(config["theta"]) * np.pi / 180  # azimuth angle of rays (clockwise from north, from above looking down, in radians)
+        rsgmeta.max_distance = config["max_distance"]  # maximum distance [m] to sample ray (balance computation time with accuracy at distance)
+        rsgmeta.min_distance = config["min_distance"]  # minimum distance [m] to sample ray (default 0, increase to avoid "lens occlusion" within dense voxels)
+        rsgmeta.id = 0
+
+        if type(rsgmeta.phi) is not np.array:
+            rsgmeta.phi = [rsgmeta.phi]
+            rsgmeta.theta = [rsgmeta.theta]
+        
+        rsgmeta.file_name = ["grid_" + rsgmeta.config_id + runtag + "_p{:.4f}_t{:.4f}.tif".format(rsgmeta.phi[ii], rsgmeta.theta[ii]) for ii in range(0, np.size(rsgmeta.phi))]
+
+        rsgm = lrs.rs_gridgen(rsgmeta, vox, initial_index=0)  # run grid resampling. Can take single or list of runs.
+
 
     # # HEMISPHERE RESAMPLING
     if config["resample_hemi"]:
@@ -97,7 +130,7 @@ def main():
                                    pts.northing_m,
                                    pts.elev_m + hemi_m_above_ground]).swapaxes(0, 1)
 
-        rshmeta.file_name = [rshmeta.config_id + "_" + str(idd) + ".tif" for idd in pts.id]
+        rshmeta.file_name = ["hemi_" + rshmeta.config_id + "_" + str(idd) + ".tif" for idd in pts.id]
 
         rshm = lrs.rs_hemigen(rshmeta, vox, tile_count_1d, n_cores)
 
