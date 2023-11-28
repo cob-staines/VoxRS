@@ -38,7 +38,7 @@ def main():
     vox.las_traj_hdf5 = os.path.join(working_dir, "voxrs_" + config_id + "_las_traj.h5")  # file path to las/trajectory file (.hdf5)
     vox.return_set = config["return_set"]  # (str) - 'first' (recommended), 'last', or 'all'
     vox.drop_class = config["drop_class"]  # (int) single class to be dropped from .las file prior to interpolation (-1 for None)
-    if vox.drop_class is None:
+    if vox.drop_class is None or vox.drop_class == "":
         vox.drop_class = -1
     
     vox.sample_dtype = np.uint32  # data type for voxel sample array (smaller is faster, overflow throws no errors)
