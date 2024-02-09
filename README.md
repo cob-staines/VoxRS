@@ -38,4 +38,4 @@ pip install -r "requirements.txt"
 ```
 
 ### Running VoxRS
-Config files (.py) are used to point to all files, specify configuration variables, and call functions. Sperate configuration files are used for the sampling (ex. config_1_sampling_template.py) and resampling (ex. config_2_resampling_template.py) steps. To run VoxRS, copy these files, enter the desired configurations, and run them in order. Examples of configuration files are provided in \examples.
+Config files (.yml) are used to specify configuration variables. Sperate configuration files are used for the sampling (config_1_sampling.yml) and resampling (config_2_resampling.yml) steps. To run VoxRS, enter the desired configurations and save the files, then run the corresponding python files (step_1_sampling.py, then step_2_resampling.py) in order. More flexibility in configuration variables and algorythm selection can be found by reviewing and revising the two .py files.

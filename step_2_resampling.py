@@ -117,8 +117,8 @@ def main():
         rshmeta.min_distance = config["min_distance"]  # minimum distance [m] to sample ray (default 0, increase to avoid "lens occlusion" within dense voxels)
 
         # PROCESSING PARAMETERS
-        tile_count_1d = 5  # (int) number of square tiles along one side (total # of tiles = tile_count_1d^2)
-        n_cores = 3  # (int) number of processing cores
+        tile_count_1d = config["tile_count_1d"]  # (int) number of square tiles along one side (total # of tiles = tile_count_1d^2)
+        n_cores = config["n_cores"]  # (int) number of processing cores
         
         # PTS CONFIGURATION
         pts_in = config["pts_in"]  # (str) path to .csv file with coordinates and elevations at which to calculate hemispheres
